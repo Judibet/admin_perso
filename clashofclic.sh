@@ -41,7 +41,7 @@
  #done
  xdotool mousemove 700 550                              # Déplacement du curseur
  xdotool click 1                                        # Clic
- sleep ${temps}                                         #Attendre 2 minutes
+ sleep ${temps}                                         # Attendre 2 minutes
  done
 
  echo "Au revoir !"
