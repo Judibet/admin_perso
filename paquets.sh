@@ -5,6 +5,8 @@
 ## VARIABLES ##
 REPERTOIRE="/media/sauvegardes/Kubuntu"
 VERSION="3.0"
+UTILISATEUR="${USER}"
+UTILISATEUR2="chris"
 
 fuction titre(){
  echo RÉINSTALLATION DES PAQUETS DU SYSTÈME && echo ""
@@ -12,16 +14,24 @@ fuction titre(){
 
 
 # Pilotes
-function pilotes(){
+function roccat(){
  echo "Installation des pilotes clavier / souris Roccat :"
  sudo apt-get install -y --force-yes roccat-tools
+ # Débugguer Roccat-Tools
+ sudo ln -s /usr/share/roccat/ryos_effect_modules/ripple.lua /usr/share/roccat/ryos_effect_modules/ripple.lc
+ ## Liens symboliques pour débugguer le sript Ripple FX et pour avoir roccateventhandler au démarrage
+ sudo ln -s /usr/share/roccat/ryos_effect_modules/ripple.lua /usr/share/roccat/ryos_effect_modules/ripple.lc
+ sudo ln -s /etc/inid.d/roccateventhandler /etc/rc4.d/roccateventhandler
+ sudo ln -s /etc/inid.d/roccateventhandler /etc/rc5.d/roccateventhandler
+ sudo ln -s /etc/inid.d/roccateventhandler /etc/rc6.d/roccateventhandler
+ sudo ln -s /etc/inid.d/roccateventhandler /etc/rcS.d/roccateventhandler
 }
 
 
 # Installation du pilote d'impression
-function imprimante(){
+function samsung(){
  echo "Installation des pilotes de d'impression Samsung :"
- sudo sh $REPERTOIRE/uld/install.sh
+ sudo sh ${REPERTOIRE}/uld/install.sh
 }
 
 
@@ -55,7 +65,7 @@ function developpement(){
  sudo apt-get install -y autoconf					# Outils GNU autotools
  sudo apt-get install -y automake					# Outils GNU autotools
  sudo apt-get install -y automake1.11					# Outils GNU autotools
- sudo apt-get install -y build-essential					# Paquet contenant la base de la programmation !
+ sudo apt-get install -y build-essential				# Paquet contenant la base de la programmation !
  sudo apt-get install -y cmake
  sudo apt-get install -y curl						# Dépendance de Steam : bibliothèque de requêtes d'URL
  sudo apt-get install -y emacs						# Editeur de texte avancé, spécial programmation !
@@ -99,7 +109,7 @@ function internet(){
  #sudo update-rc.d mysql-tmpfs defaults 18 22 # Exexuction du script de mise en cache avant le lancement de MySQL
  #sudo service mysql start
  # Première base de donnée
- sh $REPERTOIRE/mysqlconf.sh
+ sh ${REPERTOIRE}/mysqlconf.sh
  #sudo apt-get install -y libsnack2 #Activation du microphone pour aMSN
  #linphone								# SIP sous Linux
  sudo apt-get install -y lynx						# Un navigateur en mode console !
@@ -119,7 +129,7 @@ function internet(){
  # sudo apt-get install -y pidgin-themes				# Possibilité de créer des thèmes sur Pidgin
  sudo apt-get install -y proftpd-basic					# Serveur FTP
  sudo apt-get install -y samba						# Partage de fichiers en réseau
- sudo cp $REPERTOIRE/etc/samba/smb.conf /etc/samba/			# Restauration de la configuration de Samba
+ sudo cp ${REPERTOIRE}/etc/samba/smb.conf /etc/samba/			# Restauration de la configuration de Samba
  sudo apt-get install -y ssh						# Installation du serveur SSH
  sudo apt-get install -y skype						# Téléphonie par Internet et voie sur IP
  #sudo apt-get install -y sun-java6-plugin				# Plugin Java pour navigateurs
@@ -137,12 +147,12 @@ function jeux(){
  sudo apt-get install -y chromium					# Un jeu de vaisseau arcade
  #ioquake3								# Quake 3 amélioré !
  sudo apt-get install -y mupen64plus					# Un émulateur Nintendo 64
- sudo apt-get install -y mupen64plus-qt                                  # Et son interface graphique...
+ sudo apt-get install -y mupen64plus-qt					# Et son interface graphique...
  sudo apt-get install -y openarena					# La renaîssance de Quake 3 Arena !
  sudo apt-get install -y openarena-server				# Possibilité de créer des serveurs Open Arena
  #pcsx									# Émulateur PlayStation
  sudo apt-get install -y pingus						# Lemmings version Linux !
- sudo apt-get install -y pokerth						# Poker sur Linux !
+ sudo apt-get install -y pokerth					# Poker sur Linux !
  #psemu-drive-cdrmooby							# Prise en charge des images CD PlayStation pour PCSX
  #psemu-input-omnijoy							# Plugin pour controlleurs pour PCSX
  #psemu-video-x11							# Plugin graphique pour PCSX
@@ -159,12 +169,12 @@ function multimedia(){
  sudo apt-get install -y abcde						# Encodeur CD sous terminal
  sudo apt-get install -y audacity					# Edition de pistes audio
  sudo apt-get install -y avidemux					# Découpeur vidéo
- sudo apt-get install -y avidemux-plugins-common				# Plugins pour Avidemux
+ sudo apt-get install -y avidemux-plugins-common			# Plugins pour Avidemux
  sudo apt-get remove -y brasero						# Désinstallation du logiciels de gravure par défaut de Gnome
- sudo apt-get install -y cinelerra-cv                                    # Logiciel de montage vidéo professionnel
+ sudo apt-get install -y cinelerra-cv					# Logiciel de montage vidéo professionnel
  sudo apt-get install -y desktop-file-utils				# Utile pour l'installation de Mobile Media Converter
- sudo apt-get install -y djmount						# Client UPnP
- #sudo apt-get install -y easytag						# Un taggueur pour fichiers audio
+ sudo apt-get install -y djmount					# Client UPnP
+ #sudo apt-get install -y easytag					# Un taggueur pour fichiers audio
  sudo apt-get install -y faac						# Codec AAC
  sudo apt-get install -y faad						# Codec M4A
  sudo apt-get install -y flac						# Codec FLAC
@@ -174,7 +184,7 @@ function multimedia(){
  sudo apt-get install -y gstreamer1.0-libav				# 
  sudo apt-get install -y icedax						# Conversion CDA
  sudo apt-get install -y inkskape					# Déssins vectoriels
- sudo apt-get install -y kid3                                            # Un taggueur pour fichiers audio
+ sudo apt-get install -y kid3						# Un taggueur pour fichiers audio
  sudo apt-get install -y kipi-plugins					# Modules complémentaires pour Gwenview
  sudo apt-get install -y kstreamripper					# Enregistrement de flux audio
  #sudo apt-get install -y kmplayer					# Lecteur multimédia pour KDE
@@ -182,28 +192,28 @@ function multimedia(){
  sudo apt-get install -y gimp-data-extras				# Plugins pour Gimp
  sudo apt-get install -y gimp-plugin-registry				# 
  sudo apt-get install -y gimp-ufraw					# Prise en compte du format RAW pour Gimp
- cp $REPERTOIRE/plugins_gimp/arrow.scm	$HOME/.gimp-2.6/scripts/
- cp $REPERTOIRE/plugins_gimp/arrow.scm	$HOME/.gimp-2.8/scripts/
- sudo apt-get install -y hal                                             # Permet de regarder des vidéo Google Play
+ cp ${REPERTOIRE}/plugins_gimp/arrow.scm	${HOME}/.gimp-2.6/scripts/
+ cp ${REPERTOIRE}/plugins_gimp/arrow.scm	${HOME}/.gimp-2.8/scripts/
+ sudo apt-get install -y hal						# Permet de regarder des vidéo Google Play
  sudo apt-get install -y lame						# Codec LAME (s'utilise avec sox pour la conversion OGG)
- #libarts1-xine					# Apperçu des MP3 au survol
+ #libarts1-xine								# Apperçu des MP3 au survol
  sudo apt-get install -y libavcodec-unstripped-52			# Permet de lire d'autre formats multimédias
  sudo apt-get install -y libdvdnav4					# Lecture des DVD avec menus
  sudo apt-get install -y libgstreamer-plugins-bad1.0-0			# 
  sudo apt-get install -y libk3b6-extracodecs				# Des plugins additionnels pour K3B
- sudo apt-get install -y libxine1-ffmpeg					# Support et lecture MP3
+ sudo apt-get install -y libxine1-ffmpeg				# Support et lecture MP3
  sudo apt-get install -y libxine1-all-plugins				# Support des formats Windows
- sudo apt-get install -y moodbar						# Humeurs pour Amarok
+ sudo apt-get install -y moodbar					# Humeurs pour Amarok
  sudo apt-get install --install-recommends -y pipelight-multi		# Pour faire fonctionner Silverlight sous Linux
- sudo apt-get install -y obs-studio                                      # Permet de faire du streaming vidéo sur Twitch et YouTube
+ sudo apt-get install -y obs-studio					# Permet de faire du streaming vidéo sur Twitch et YouTube
  sudo pipelight-plugin --update
  #sudo pipelight-plugin --enable flash
- sudo pipelight-plugin --enable silverlight                              # Active Silverlight
- sudo pipelight-plugin --unlock shockwave                                # Débloque le plugin Shockwave
- sudo pipelight-plugin --enable shockwave                                # Active le plugin Shockwave
- sudo pipelight-plugin --enable unity3d                                  # Active le mode Unity3D de Silverlight
- sudo pipelight-plugin --enable widevine                                 # Active la possibilité de voir les vidéos Silverlight protégés par DRM
- sudo pipelight-plugin --create-mozilla-plugins                          # Créer les plugins Piplelight pour Mozilla
+ sudo pipelight-plugin --enable silverlight				# Active Silverlight
+ sudo pipelight-plugin --unlock shockwave				# Débloque le plugin Shockwave
+ sudo pipelight-plugin --enable shockwave				# Active le plugin Shockwave
+ sudo pipelight-plugin --enable unity3d					# Active le mode Unity3D de Silverlight
+ sudo pipelight-plugin --enable widevine				# Active la possibilité de voir les vidéos Silverlight protégés par DRM
+ sudo pipelight-plugin --create-mozilla-plugins				# Créer les plugins Piplelight pour Mozilla
  #sudo apt-get install -y mplayer					# Un super lecteur multimedia !
  #sudo apt-get install -y realplayer					# Lecteur multimédia Real Player
  sudo apt-get install -y regionset					# Lecture des DVD multi-régions
@@ -211,12 +221,12 @@ function multimedia(){
  sudo apt-get install -y soundkonverter					# Conversion audio
  sudo apt-get install -y sox						# Conversion OGG vers MP3 (s'utmon					# Prise en charge duilise avec lame)
  sudo apt-get install -y speex						# Codec Speex
- sudo apt-get install -y spotify-client                                  # Lecteur multimédia en ligne
+ sudo apt-get install -y spotify-client					# Lecteur multimédia en ligne
  sudo apt-get install -y timidity					# Support MIDI
  sudo apt-get install -y transcode					# Encodage de vidéos RAW
  sudo apt-get install -y vorbis-tools					# Codec OGG Vorbis
  #sudo apt-get install -y w32codecs					# De nombreux codecs Windows (WMA, RealAudio etc...)
- sudo apt-get install -y wavpack						# Codec WavePack
+ sudo apt-get install -y wavpack					# Codec WavePack
  sudo apt-get install -y xine-plugin					# Permet de voir des vidéos avec un navigateur
 }
 
@@ -233,42 +243,42 @@ function outils(){
  #sudo apt-get install -y disk-manager					# Configurer graphiquement les partitions
  sudo apt-get install -y flashrom					# Flasher le BIOS depuis Linux !
  sudo apt-get install -y foremost					# Permet de récupérer les éléments supprimés
- sudo apt-get install -y fuseiso						# Montage d'images ISO
+ sudo apt-get install -y fuseiso					# Montage d'images ISO
  sudo apt-get install -y gnupg2						# GNU Privacy Guard
  #sudo apt-get install -y gtk-recordmydesktop				# Interface graphique pour recordmydesktop
  sudo apt-get install -y gucharmap					# Table de caractères
- sudo apt-get install -y i7z                                             # Permet d'afficher en ligne de commandes les informatiosn sur les cors du CPU ainsi que le mode turbo
- sudo apt-get install -y i7z-gui                                         # Permet d'afficher graphiquement les informations sur les cores du CPU
+ sudo apt-get install -y i7z						# Permet d'afficher en ligne de commandes les informatiosn sur les cors du CPU ainsi que le mode turbo
+ sudo apt-get install -y i7z-gui					# Permet d'afficher graphiquement les informations sur les cores du CPU
  sudo apt-get install -y john						# Brute Force
- sudo apt-get install -y k3b-extrathemes					# Thèmes supplémentaires pour K3b
- sudo apt-get install -y kazam                                           # Capture vidéo du bureau
- sudo cp $REPERTOIRE/usr/lib/python3/dist-packages/kazam/backend/gstreamer.py /usr/lib/python3/dist-packages/kazam/backend/
+ sudo apt-get install -y k3b-extrathemes				# Thèmes supplémentaires pour K3b
+ sudo apt-get install -y kazam						# Capture vidéo du bureau
+ sudo cp ${REPERTOIRE}/usr/lib/python3/dist-packages/kazam/backend/gstreamer.py /usr/lib/python3/dist-packages/kazam/backend/
  sudo apt-get install -y kchmviewer					# Lecture des fichiers d'aide Windows
- sudo apt-get install -y kdocker						# Réduire les applications dans la barre des tâches
+ sudo apt-get install -y kdocker					# Réduire les applications dans la barre des tâches
  sudo apt-get install -y kgpg						# Utilisation graphique du GnuPGP !
  sudo apt-get install -y krdc						# VNC pour KDE
  #sudo apt-get install -y libcv2.3					# Librairie de reconnaissance faciale
  #sudo apt-get install -y libcv-dev					# Librairie de reconnaissance faciale
  #sudo apt-get install -y multisystem					# Permet de créer des clés USB démarrables avec plusieurs systèmes
- sudo apt-get install -y nextcloud-client                                # Client Nexcloud pour Linux
+ sudo apt-get install -y nextcloud-client				# Client Nexcloud pour Linux
  #sudo apt-get install -y numlockx					# Activation du pavé numérique
- sudo apt-get install -y obexftp						# Protocole de transfert de fichiers Bluetooth (voire Irda)
- #sudo apt-get install -y pam-face-authentication				# Reconnaissance faciale
+ sudo apt-get install -y obexftp					# Protocole de transfert de fichiers Bluetooth (voire Irda)
+ #sudo apt-get install -y pam-face-authentication			# Reconnaissance faciale
  sudo apt-get install -y python-gpgme					# Pour Dropbox...
- #sudo apt-get install -y recordmydesktop					# Capture vidéo du bureau
+ #sudo apt-get install -y recordmydesktop				# Capture vidéo du bureau
  #sudo apt-get install -y gparted					# Outil de partitionnement
  #sudo apt-get install -y skanlite					# Logiciel de numérisation
  sudo apt-get install -y testdisk					# Test de partitions
  #sudo apt-get install -y unetbootin					# Utilitaire pour créer des clés USB démarrables au boot
- sudo apt-get install -y usb-creator-kde					# Utilitaire pour créer des clés USB démarrrables au boot
+ sudo apt-get install -y usb-creator-kde				# Utilitaire pour créer des clés USB démarrrables au boot
  sudo apt-get install -y vim						# Éditeur de textes en lignes de commandes très populaire avec coloration sytaxique
  sudo apt-get install -y wine						# Émulateur Windows
- sudo apt-get install -y wine1.6						# Wine version 1.6
+ sudo apt-get install -y wine1.6					# Wine version 1.6
  sudo apt-get install -y wine1.6-amd64					# Prise en charge 64 bits pour Wine
  sudo apt-get install -y wine1.6-i386					# prise en charge 32 bits pour Wine
- sudo apt-get install -y xdotool						# Permet d'automatiser des clics souris et entrées clavier !
+ sudo apt-get install -y xdotool					# Permet d'automatiser des clics souris et entrées clavier !
  sudo apt-get install -y xterm						# Console de base, dépendance de Steam
- sudo apt-get install -y yakuake						# Console fun pour KDE
+ sudo apt-get install -y yakuake					# Console fun pour KDE
 }
 
 
@@ -288,7 +298,7 @@ function divers(){
 echo "Installation des applications supplémentaires :"
  sudo apt-get install -y exfat-fuse					# Permet de lire les cartes formatées exFAT
  sudo apt-get install -y exfat-utils					# Permet de lire les cartes formatées exFAT
- sudo apt-get install -y grub-customizer					# Permet de personnaliser Grub
+ sudo apt-get install -y grub-customizer				# Permet de personnaliser Grub
  sudo apt-get install -y gsfonts-x11					# Polices Ghostscript sous x11
  sudo apt-get install -y kdenetwork-dbg					# Librairie de débuguage
  #sudo apt-get install -y libqt4-dbg					# Librairie de débuguage
@@ -301,23 +311,16 @@ echo "Installation des applications supplémentaires :"
  sudo apt-get install -y mesa-utils-extra				# Utilitaires pour tester la carte vidéo
  sudo apt-get install -y msttcorefonts					# Polices Microsoft
  #sudo apt-get install -y nvidia-common					# Pilote générique Nvidia
- #sudo apt-get install -y nvidia-current					# Derniere version du pilote Nvidia
- sudo apt-get install -y nvidia-settings					# Permet de configurer graphiquement la carte vidéo Nvidia
+ #sudo apt-get install -y nvidia-current				# Derniere version du pilote Nvidia
+ sudo apt-get install -y nvidia-settings				# Permet de configurer graphiquement la carte vidéo Nvidia
  #sudo apt-get install -y oem-audio-hda-daily-lts-vivid-dkms		# Pilotes audio Intel a170
  #sudo apt-get install -y ubuntuone-installer				# Ubuntu One, le cloud
  #sudo apt-get install -y ubuntuone-control-panel			# Panneau de controle pour Ubuntu One
  sudo apt-get install -y virtualbox virtualbox-qt virtualbox-dkms	# Émulateur PC/Mac
- version=$(VBoxManage --version|cut -dr -f1|cut -d'_' -f1) && sudo wget http://download.virtualbox.org/virtualbox/$version/VBoxGuestAdditions_$version.iso -O /usr/share/virtualbox/VBoxGuestAdditions.iso
+ version=$(VBoxManage --version|cut -dr -f1|cut -d'_' -f1) && sudo wget http://download.virtualbox.org/virtualbox/${version}/VBoxGuestAdditions_${version}.iso -O /usr/share/virtualbox/VBoxGuestAdditions.iso
  ## Support AMR/3GP (non fonctionnel pour le moment) ##
  #quilt dpkg-dev libimlib2-dev texi2html liblame-dev libfaad-dev libmp4v2-dev libfaac-dev libxvidcore4-dev debhelper libogg-dev libvorbis-dev liba52-dev libdts-dev libsdl1.2debian-all libraw1394-dev libdc1394-13-dev libtheora-dev libgsm1-dev libx264-dev x264 libxvidcore4
  sudo apt-get install -y zram-config                                     # Compression de la mémoire RAM
-
- # Pour Microsoft Office 32 bits
- #sudo apt-get install -y ia32-libs
- #sudo apt-get install -y libgl1-mesa-dev
- #sudo apt-get install -y libgl1-mesa-glx:i386
- #sudo ln -s /usr/lib/i386-linux-gnu/mesa/libGL.so.1 /usr/lib/i386-linux-gnu/mesa/libGL.so
- #sudo ln -s /usr/lib/i386-linux-gnu/mesa/libGL.so /usr/lib/i386-linux-gnu/libGL.so
 }
 
 
@@ -325,39 +328,36 @@ echo "Installation des applications supplémentaires :"
 ## Installations manuelles, copies et liens symboliques
 function autres(){
  echo "Installations d'applicationfs diverses :"
- sudo dpkg -i $REPERTOIRE/Paquets/*.deb | sudo cp -r $REPERTOIRE/usr/share/* /usr/share | bzip2 -d $REPERTOIRE/Paquets/*.bzip2 | tar xvf $REPERTOIRE/Paquets/*.tar | sudo mv $REPERTOIRE/Paquets/bluegriffon /usr/share | sudo ln -s /usr/share/bluegriffon/bluegriffon /usr/bin/bluegriffon | sudo cp -r $REPERTOIRE/etc/init.d/* /etc/init.d/
- #sudo alien -i $REPERTOIRE/Paquets/*.rpm
- #sudo sh $REPERTOIRE/Paquets/*.run
- ## Liens symboliques pour débugguer le sript Ripple FX et pour avoir roccateventhandler au démarrage
- sudo ln -s /usr/share/roccat/ryos_effect_modules/ripple.lua /usr/share/roccat/ryos_effect_modules/ripple.lc
- sudo ln -s /etc/inid.d/roccateventhandler /etc/rc4.d/roccateventhandler
- sudo ln -s /etc/inid.d/roccateventhandler /etc/rc5.d/roccateventhandler
- sudo ln -s /etc/inid.d/roccateventhandler /etc/rc6.d/roccateventhandler
- sudo ln -s /etc/inid.d/roccateventhandler /etc/rcS.d/roccateventhandler
+ sudo dpkg -i ${REPERTOIRE}/Paquets/*.deb | sudo cp -r ${REPERTOIRE}/usr/share/* /usr/share | bzip2 -d ${REPERTOIRE}/Paquets/*.bzip2 | tar xvf ${REPERTOIRE}/Paquets/*.tar | sudo mv ${REPERTOIRE}/Paquets/bluegriffon /usr/share | sudo ln -s /usr/share/bluegriffon/bluegriffon /usr/bin/bluegriffon | sudo cp -r ${REPERTOIRE}/etc/init.d/* /etc/init.d/
+ #sudo alien -i ${REPERTOIRE}/Paquets/*.rpm
+ #sudo sh ${REPERTOIRE}/Paquets/*.run
  ## Attribution des droits
  sudo chmod -R +rx /usr/share bluegriffon genymotion TeamSpeak*
  sudo chmod +x /etc/init.d/*
- ## Attribution des groupes
- sudo usermod -G cdrom -a chris
- sudo usermod -G floppy -a $USER,chris
- sudo usermod -G roccat -a $USER,chris
- sudo usermod -G tape -a $USER,chris
- sudo usermod -G vboxusers -a $USER,chris
+}
 
 
-
-# Débugguer Roccat-Tools
-sudo ln -s /usr/share/roccat/ryos_effect_modules/ripple.lua /usr/share/roccat/ryos_effect_modules/ripple.lc
+## Attribution des groupes
+function groupes(){
+ # VARIABLES LOCALES #
+ COMPTE1="${1}"
+ COMPTE2="${2}"
+ sudo usermod -G cdrom -a ${COMPTE2}
+ sudo usermod -G floppy -a ${COMPTE1},${COMPTE2}
+ sudo usermod -G roccat -a ${COMPTE1},${COMPTE2}
+ sudo usermod -G tape -a ${COMPTE1},${COMPTE2}
+ sudo usermod -G vboxusers -a ${COMPTE1},${COMPTE2}
 }
 
 
 # Dernières mises à jour...
 function finalisation(){
  echo "Finalisation et mises à jours..."
- sudo apt-get install -f # Permet d'installer les dépendances manquantes
+ sudo apt-get install -f						# Permet d'installer les dépendances manquantes
  sudo apt-get update -y && apt-get upgrade -y && sudo apt-get dist-upgrade -y
 }
 
+# Fin
 function fin(){
  echo RÉINSTALLATION DES PAQUETS DU SYSTÈME TERMINÉE && echo ""
  echo "Faire un sudo apt-get install -y nvidia-370 après redémarrage du système."
@@ -365,11 +365,13 @@ function fin(){
  exit 0
 }
 
-## DÉBUT ##
- titre
- echo Mise à jour en cours...
- sudo apt-get update -y
- pilotes
+# Installation complète
+function toutinstaller(){
+ # VARIABLES LOCALES #
+ COMPTE1="${1}"
+ COMPTE2="${2}"
+ roccat
+ samsung
  imprimantes
  bureautique
  archivage
@@ -381,7 +383,15 @@ function fin(){
  secur
  divers
  autres
+ groupes "${COMPTE1}" "${COMPTE2}"
  finalisation
+}
+
+## DÉBUT ##
+ titre
+ echo Mise à jour en cours...
+ sudo apt-get update -y
+ toutinstaller "${UTILISATEUR}" "${UTILISATEUR2}" "${REPERTOIRE}"
 
 ## FIN ##
  fin
