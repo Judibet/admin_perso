@@ -19,7 +19,7 @@ function roccat(){
  sudo apt-get install -y --force-yes roccat-tools
  # Débugguer Roccat-Tools
  sudo ln -s /usr/share/roccat/ryos_effect_modules/ripple.lua /usr/share/roccat/ryos_effect_modules/ripple.lc
- ## Liens symboliques pour débugguer le sript Ripple FX et pour avoir roccateventhandler au démarrage
+ ## Liens symboliques pour débugguer le script Ripple FX et pour avoir roccateventhandler au démarrage
  sudo ln -s /usr/share/roccat/ryos_effect_modules/ripple.lua /usr/share/roccat/ryos_effect_modules/ripple.lc
  sudo ln -s /etc/inid.d/roccateventhandler /etc/rc4.d/roccateventhandler
  sudo ln -s /etc/inid.d/roccateventhandler /etc/rc5.d/roccateventhandler
