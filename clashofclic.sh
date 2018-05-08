@@ -43,7 +43,7 @@ function script_principal(){
 
  #WIDS=`xdotool search --onlyvisible --name "Genymotion"`
  #for id in $WIDS; do
- #  xdotool windowactivate --sync $WIDS
+ #xdotool windowactivate --sync $WIDS
  #done
  xdotool mousemove 700 550				# Déplacement du curseur
  xdotool click 1					# Clic
@@ -79,9 +79,9 @@ function usage(){
     exit 0
    ;;
    "usage" )
-    echo "${0}                    # Exécution du script"
-    echo "${0} -h | --help        # Manuel d'exécution du script"
-    echo "${0} --usage            # Usage"
+    echo "${0}                    			# Exécution du script"
+    echo "${0} -h | --help        			# Manuel d'exécution du script"
+    echo "${0} --usage            			# Usage"
     echo ""
     exit 0
    ;;
