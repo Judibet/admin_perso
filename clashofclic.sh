@@ -1,18 +1,16 @@
 #!/bin/bash
+ set +x
  # Constantes / Variables
  clan="Kux de Noisy"
  jeu="Clash of Clans"
  auteur="Judibet"
- version="1.4b"
+ version="1.5b"
  robot="xdotool"
  temps="120"
 
- set +x
-
- clear
-
 # Titre
 function titre(){
+ clear
  echo "Script de clic automatique pour Clash of Clans pour le clan ${clan} !"
  echo "Auteur du script : ${auteur}"
  echo "Version du script : ${version}"
@@ -74,7 +72,7 @@ function usage(){
  typemsg="${*}"
   case "${typemsg}" in
    "manuel" | "manual" )
-    echo "Ce script s'execute en boucle pour effectuer des clics réguliers."
+    echo "Ce script s'exécute en boucle pour effectuer des clics réguliers."
     echo "Un clic sera effectué toute les deux minutes par défaut."
     echo "Pour quitter, faire CTRL+Z."
     echo ""
