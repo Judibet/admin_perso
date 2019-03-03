@@ -4,7 +4,7 @@ set +x
 clan="Kux de Noisy"
 jeu="Clash of Clans"
 auteur="Judibet"
-version="1.6b"
+version="1.7b"
 robot="xdotool"
 temps="120"
 
@@ -86,6 +86,7 @@ function usage(){
     echo "Un clic sera effectué toute les deux minutes par défaut."
     echo "Pour quitter, faire CTRL+Z."
     echo
+    usage "usage"
     exit 0
     ;;
     "usage" )
@@ -116,8 +117,13 @@ function usage(){
 
 # DÉBUT
 # Test si paramètre entré ou non
-if [[ "${#}" > 0 ]]; then
-    testparams "${@}"
+if [[ "${#}" -gt  0 ]]; then
+    if [[ "${#}" -gt 1 ]]; then
+        echo "Trop de paramètres [${#}/1]"
+        usage "usage"
+    else
+        testparams "${@}"
+    fi
 fi
 # Démarrage normal
 titre
