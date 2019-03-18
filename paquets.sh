@@ -1,43 +1,71 @@
-#!/bin/sh
+#!/bin/bash
 ## LISTE DES PAQUETS INSTALLÉS ##
 ## Par Judibet (personnalisé)  ##
 
 ## VARIABLES ##
-REPERTOIRE="/media/sauvegardes/Kubuntu"
-VERSION="3.0"
-UTILISATEUR="${USER}"
-UTILISATEUR2="chris"
+REPERTOIRE="/media/sauvegardes/Kubuntu"					# Répertoire contenant les sauvegardes
+VERSION="3.1"								# Version du script
+UTILISATEUR="${USER}"							# Utilisateur courant
+UTILISATEUR2="chris"							# Autre utilisateur
+
+##COULEURS ET STYLES ##
+DEFAUT="$(tput sgr0)"							# Aucun style
+NOIR="$(tput setaf 0)"							# Texte noir
+ROUGE="$(tput setaf 1)"							# Texte rouge
+VERT="$(tput setaf 2)"							# Texte vert
+JAUNE="$(tput setaf 3)"							# Texte jaune
+BLEU="$(tput setaf 4)"							# Texte bleu
+MAGENTA="$(tput setaf 5)"						# Texte magenta
+CYAN="$(tput setaf 6)"							# Texte cyan
+BLANC="$(tput setaf 7)"							# Texte blanc
+FNOIR="$(tput setab 0)"							# Fond noir
+FROUGE="$(tput setab 1)"						# Fond rouge
+FVERT="$(tput setab 2)"							# Fond vert
+FJAUNE="$(tput setab 3)"						# Fond jaune
+FBLEU="$(tput setab 4)"							# Fond bleu
+FMAGENTA="$(tput setab 5)"						# Fond magenta
+FCYAN="$(tput setab 6)"							# Fond cyan
+FBLANC="$(tput setab 7)"						# Texte blanc
+GRAS="$(tput bold)"							# Gras
+DEMI_TEINTE="$(tput dim)"						# Demi-teinte
+MODESOULIGNE="$(tput smul)"						# Activer le soulignement
+PASSOULIGNE="$(tput rmul)"						# Désactiver le soulignement
+INVERSE="$(tput rev)"							# Inverser le style
+MODEGRAS="$(tput smso)"							# Activer la mise en gras
+PASGRAS="$(tput rmso)"							# Désactiver la mise en gras
+SONNETTE="$(tput bel)"							# Faire sonner le PC
 
 fuction titre(){
- echo RÉINSTALLATION DES PAQUETS DU SYSTÈME && echo ""
+ echo "${FBLEU}${BLANC} RÉINSTALLATION DES PAQUETS DU SYSTÈME${DEFAUT}"
+ echo
 }
 
 
 # Pilotes
 function roccat(){
- echo "Installation des pilotes clavier / souris Roccat :"
+ echo "${VERT} Installation des pilotes clavier / souris Roccat :${DEFAUT}"
  sudo apt-get install -y --force-yes roccat-tools
  # Débugguer Roccat-Tools
- sudo ln -s /usr/share/roccat/ryos_effect_modules/ripple.lua /usr/share/roccat/ryos_effect_modules/ripple.lc
+ sudo ln -s "/usr/share/roccat/ryos_effect_modules/ripple.lua" "/usr/share/roccat/ryos_effect_modules/ripple.lc"
  ## Liens symboliques pour débugguer le script Ripple FX et pour avoir roccateventhandler au démarrage
- sudo ln -s /usr/share/roccat/ryos_effect_modules/ripple.lua /usr/share/roccat/ryos_effect_modules/ripple.lc
- sudo ln -s /etc/inid.d/roccateventhandler /etc/rc4.d/roccateventhandler
- sudo ln -s /etc/inid.d/roccateventhandler /etc/rc5.d/roccateventhandler
- sudo ln -s /etc/inid.d/roccateventhandler /etc/rc6.d/roccateventhandler
- sudo ln -s /etc/inid.d/roccateventhandler /etc/rcS.d/roccateventhandler
+ sudo ln -s "/usr/share/roccat/ryos_effect_modules/ripple.lua" "/usr/share/roccat/ryos_effect_modules/ripple.lc"
+ sudo ln -s "/etc/inid.d/roccateventhandler" "/etc/rc4.d/roccateventhandler"
+ sudo ln -s "/etc/inid.d/roccateventhandler" "/etc/rc5.d/roccateventhandler"
+ sudo ln -s "/etc/inid.d/roccateventhandler" "/etc/rc6.d/roccateventhandler"
+ sudo ln -s "/etc/inid.d/roccateventhandler" "/etc/rcS.d/roccateventhandler"
 }
 
 
 # Installation du pilote d'impression
 function samsung(){
- echo "Installation des pilotes de d'impression Samsung :"
+ echo "${VERT} Installation des pilotes de d'impression Samsung :${DEFAUT}"
  sudo sh ${REPERTOIRE}/uld/install.sh
 }
 
 
 ## Bureautique ##
 function bureautique(){
- echo "Installation des applications bureautiques :"
+ echo "${VERT} Installation des applications bureautiques :${DEFAUT}"
  #sudo apt-get install -y gnucash					# Logiciel de gestion de gestion financière
  sudo apt-get install -y kde-thumbnailer-openoffice			# Apperçu KDE des documents OpenOffice
  sudo apt-get install -y kmymoney					# Logiciel de gestion des comptes
@@ -51,7 +79,7 @@ function bureautique(){
 
 ## Compression et archive ##
 function archivage(){
- echo "Installation des applications de compression et archivage :"
+ echo "${VERT} Installation des applications de compression et archivage :${DEFAUT}"
  sudo apt-get install -y cabextract					# Extraction d'archives CAB
  sudo apt-get install -y p7zip-full					# Extraction d'archives 7z
  sudo apt-get install -y unace-nonfree					# Extraction d'archives ACE
@@ -61,7 +89,7 @@ function archivage(){
 
 ## Développement ##
 function developpement(){
- echo "Installation des applications de développements :"
+ echo "${VERT} Installation des applications de développements :${DEFAUT}"
  sudo apt-get install -y autoconf					# Outils GNU autotools
  sudo apt-get install -y automake					# Outils GNU autotools
  sudo apt-get install -y automake1.11					# Outils GNU autotools
@@ -76,7 +104,7 @@ function developpement(){
 
 ## Internet et réseaux ##
 function internet(){
- echo "Installation des applications pour Internet :"
+ echo "${VERT} Installation des applications pour Internet :${DEFAUT}"
  sudo apt-get install -y adobe-flashplugin				# Lecteur Flash
  sudo apt-get install -y aircrack-ng					# Piratage Wi-Fi
  #sudo apt-get install -y amsn						# MSN Messenger sous Linux !
@@ -94,7 +122,7 @@ function internet(){
  sudo apt-get install -y google-talkplugin				# Vidéo pour Google Talk
  sudo apt-get install -y iperf						# Test des performances réseau
  sudo apt-get install -y kget						# Gestionnaire de téléchargements pour Konqueror
- #sudo apt-get install -y krbf						# Partage du bureau à distance
+ sudo apt-get install -y krfb						# Partage du bureau à distance
  #sudo apt-get remove -y kopete						# Messagerie instantanée
  #kopete-facebook							# Facebook Messenger dans Kopete !
  # LAMP (dans l'ordre) #
@@ -141,7 +169,7 @@ function internet(){
 
 ## Jeux ##
 function jeux(){
- echo "Installation des jeux :"
+ echo "${VERT} Installation des jeux :${DEFAUT}"
  sudo apt-get install -y alien-arena					# Un Quake Like dans la peau d'aliens !
  sudo apt-get install -y alien-arena-server				# Possibilité de créer des serveurs Alien Arena
  sudo apt-get install -y chromium					# Un jeu de vaisseau arcade
@@ -165,7 +193,7 @@ function jeux(){
 
 ## Multimédia ##
 function multimedia(){
- echo "Installation des applications multimédias :"
+ echo "${VERT} Installation des applications multimédias :${DEFAUT}"
  sudo apt-get install -y abcde						# Encodeur CD sous terminal
  sudo apt-get install -y audacity					# Edition de pistes audio
  sudo apt-get install -y avidemux					# Découpeur vidéo
@@ -233,7 +261,7 @@ function multimedia(){
 
 ## Utilitaires ##
 function outils(){
- echo "Installation des utilitaires :"
+ echo "${VERT}Installation des utilitaires :${DEFAUT}"
  sudo apt-get install -y acetoneiso					# L'utilitaire le plus géant des images CD !
  sudo apt-get install -y alien						# Installation des parquets RPM
  sudo apt-get install -y android-tools-adb				# Outils pour Android
@@ -284,7 +312,7 @@ function outils(){
 
 ## ANTIVIRUS ##
 function secur(){
- echo "Installation de l'antivirus :"
+ echo "${VERT} Installation de l'antivirus :${DEFAUT}"
  sudo apt-get install -y clamav						# Antivirus
  #sudo apt-get install -y clamav-daemon					# Démon de Clamav, trop lent à mon goût...
  sudo apt-get install -y clamtk						# Interface graphique pour Clamav
@@ -295,7 +323,7 @@ function secur(){
 
 ## DIVERS ##
 function divers(){
-echo "Installation des applications supplémentaires :"
+echo "${VERT} Installation des applications supplémentaires :${DEFAUT}"
  sudo apt-get install -y exfat-fuse					# Permet de lire les cartes formatées exFAT
  sudo apt-get install -y exfat-utils					# Permet de lire les cartes formatées exFAT
  sudo apt-get install -y grub-customizer				# Permet de personnaliser Grub
@@ -327,7 +355,7 @@ echo "Installation des applications supplémentaires :"
 # Installations manuelles et attributions des droits
 ## Installations manuelles, copies et liens symboliques
 function autres(){
- echo "Installations d'applicationfs diverses :"
+ echo "${VERT} Installations d'applicationfs diverses :${DEFAUT}"
  sudo dpkg -i ${REPERTOIRE}/Paquets/*.deb | sudo cp -r ${REPERTOIRE}/usr/share/* /usr/share | bzip2 -d ${REPERTOIRE}/Paquets/*.bzip2 | tar xvf ${REPERTOIRE}/Paquets/*.tar | sudo mv ${REPERTOIRE}/Paquets/bluegriffon /usr/share | sudo ln -s /usr/share/bluegriffon/bluegriffon /usr/bin/bluegriffon | sudo cp -r ${REPERTOIRE}/etc/init.d/* /etc/init.d/
  #sudo alien -i ${REPERTOIRE}/Paquets/*.rpm
  #sudo sh ${REPERTOIRE}/Paquets/*.run
@@ -339,28 +367,30 @@ function autres(){
 
 ## Attribution des groupes
 function groupes(){
- # VARIABLES LOCALES #
- COMPTE1="${1}"
- COMPTE2="${2}"
- sudo usermod -G cdrom -a ${COMPTE2}
- sudo usermod -G floppy -a ${COMPTE1},${COMPTE2}
- sudo usermod -G roccat -a ${COMPTE1},${COMPTE2}
- sudo usermod -G tape -a ${COMPTE1},${COMPTE2}
- sudo usermod -G vboxusers -a ${COMPTE1},${COMPTE2}
+    # Variables locales
+    local Compte1="${1}"						# Compte de l'utilisateur actuel
+    local Compte2="${2}"						# Autre compte autorisé
+    #
+    sudo usermod -G cdrom -a ${Compte2}
+    sudo usermod -G floppy -a ${Compte1},${Compte2}
+    sudo usermod -G roccat -a ${Compte1},${Compte2}
+    sudo usermod -G tape -a ${Compte1},${Compte2}
+    sudo usermod -G vboxusers -a ${Compte1},${Compte2}
 }
 
 
 # Dernières mises à jour...
 function finalisation(){
- echo "Finalisation et mises à jours..."
+ echo "${VERT} Finalisation et mises à jours...${DEFAUT}"
  sudo apt-get install -f						# Permet d'installer les dépendances manquantes
  sudo apt-get update -y && apt-get upgrade -y && sudo apt-get dist-upgrade -y
 }
 
 # Fin
 function fin(){
- echo RÉINSTALLATION DES PAQUETS DU SYSTÈME TERMINÉE && echo ""
- echo "Faire un sudo apt-get install -y nvidia-370 après redémarrage du système."
+ echo "${FVERT}${BLEU} RÉINSTALLATION DES PAQUETS DU SYSTÈME TERMINÉE${DEFAUT}"
+# echo "${JAUNE} Faire un ${MAGENTA}sudo apt-get install -y nvidia-370${DEFAUT} après redémarrage du système.${DEFAUT}"
+ echo "${JAUNE} Faire un ${MAGENTA}sudo apt-get install -y nvidia-396${DEFAUT} après redémarrage du système.${DEFAUT}"
  #pause
  exit 0
 }
