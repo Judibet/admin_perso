@@ -3,7 +3,7 @@
 ## Par Judibet (personnalisé)  ##
 
 ## VARIABLES ##
-VERSION="3.3"															# Version du script
+VERSION="3.4"															# Version du script
 UTILISATEUR="${USER}"														# Utilisateur courant
 LISTE_UTILISATEURS="$(echo $(getent passwd | awk -F: '999<$3 && $3<30000 && $1 != "nobody" {print $1}' | tr '\n' ','))"		# Liste des comptes utilisateurs
 TEMPORAIRE="$(mktemp --tmpdir=/var/tmp)"											# Fichier temporaire
@@ -3414,30 +3414,6 @@ function PaquetsUtilitaires(){
 			local CodeRetour=0
 			TestSiErreur ${CodeRetour} "${Paquet}" "ok"
 		fi
-#		local Paquet="multisystem"				# Permet de créer des clés USB démarrables avec plusieurs systèmes
-#		local Cle="http://liveusb.info/multisystem/depot/multisystem.asc"						# Clé publique du dépôt
-#		local Depot="http://liveusb.info/multisystem/depot"	# Dépôt
-#		if [[ $(dpkg -s ${Paquet} 2> '/dev/null' | grep Status | awk '{print $3}' | tr '[:upper:]' '[:lower:]') != "ok" ]]; then
-#			echo " ${CYAN}Installation du paquet ${BLANC}${Paquet}${CYAN} en cours...${DEFAUT}"
-#			echo " ${JAUNE}Ajout de la clé publique ${CYAN}${Cle}${JAUNE} pour le dépôt ${CYAN}${Depot}${JAUNE} en cours...${DEFAUT}"
-#			sudo wget -q -O- ${Cle} | sudo apt-key add -																			2>&0
-#			local CodeRetour=${?}
-#			TestSiErreur ${CodeRetour} "${Cle}" "clé"
-#			echo "deb http://liveusb.info/multisystem/depot all main" |  sudo tee "/etc/apt/sources.list.d/${Paquet}.list"								> '/dev/null'
-#			local CodeRetour=${?}
-#			TestSiErreur ${CodeRetour} "${Depot}" "ajout_dépôt"
-#			if [[ ${CodeRetour} -eq 0 ]]; then
-#				sudo apt-get install -qq -y ${Paquet}																> '/dev/null'
-#				local CodeRetour=${?}
-#				TestSiErreur ${CodeRetour} "${Paquet}"
-#			fi
-#			if [[ -e "multisystem.asc" ]]; then
-#				sudo rm "multisystem.asc"																	> '/dev/null'
-#			fi
-#		else
-#			local CodeRetour=0
-#			TestSiErreur ${CodeRetour} "${Paquet}" "ok"
-#		fi
 		local Paquet="fuseiso"					# Montage d'images ISO
 		if [[ $(dpkg -s ${Paquet} 2> '/dev/null' | grep Status | awk '{print $3}' | tr '[:upper:]' '[:lower:]') != "ok" ]]; then
 			echo " ${CYAN}Installation du paquet ${BLANC}${Paquet}${CYAN} en cours...${DEFAUT}"
@@ -3479,6 +3455,50 @@ function PaquetsUtilitaires(){
 			fi
 			:
 		fi
+		local Paquet="keepassxc"				# Gestionnaire de mots de passe
+		local Cle="D89C66D0E31FEA2874EBD20561922AB60068FCD6"	# Clé publique du dépôt
+		local Depot="ppa:phoerious/keepassxc"			# Dépôt
+		if [[ $(dpkg -s ${Paquet} 2> '/dev/null' | grep Status | awk '{print $3}' | tr '[:upper:]' '[:lower:]') != "ok" ]]; then
+			echo " ${CYAN}Installation du paquet ${BLANC}${Paquet}${CYAN} en cours...${DEFAUT}"
+			echo " ${JAUNE}Ajout de la clé publique ${CYAN}${Cle}${JAUNE} pour le dépôt ${CYAN}${Depot}${JAUNE} en cours...${DEFAUT}"
+			sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys ${Cle}															2>&0
+			local CodeRetour=${?}
+			TestSiErreur ${CodeRetour} "${Cle}" "clé"
+			sudo add-apt-repository -y ${Depot}																		> '/dev/null'
+			local CodeRetour=${?}
+			TestSiErreur ${CodeRetour} "${Depot}" "ajout_dépôt"
+			echo " ${JAUNE}Mise à jour en cours...${DEFAUT}"
+			sudo apt-get update -qq -y																			> '/dev/null'
+			local CodeRetour=${?}
+			TestSiErreur ${CodeRetour} "" "maj"
+			sudo apt-get install -qq -y ${Paquet}																		> '/dev/null'
+			local CodeRetour=${?}
+			TestSiErreur ${CodeRetour} "${Paquet}"
+		fi
+#		local Paquet="multisystem"				# Permet de créer des clés USB démarrables avec plusieurs systèmes
+#		local Cle="http://liveusb.info/multisystem/depot/multisystem.asc"						# Clé publique du dépôt
+#		local Depot="http://liveusb.info/multisystem/depot"	# Dépôt
+#		if [[ $(dpkg -s ${Paquet} 2> '/dev/null' | grep Status | awk '{print $3}' | tr '[:upper:]' '[:lower:]') != "ok" ]]; then
+#			echo " ${CYAN}Installation du paquet ${BLANC}${Paquet}${CYAN} en cours...${DEFAUT}"
+#			echo " ${JAUNE}Ajout de la clé publique ${CYAN}${Cle}${JAUNE} pour le dépôt ${CYAN}${Depot}${JAUNE} en cours...${DEFAUT}"
+#			sudo wget -q -O- ${Cle} | sudo apt-key add -																			2>&0
+#			local CodeRetour=${?}
+#			TestSiErreur ${CodeRetour} "${Cle}" "clé"
+#			echo "deb http://liveusb.info/multisystem/depot all main" |  sudo tee "/etc/apt/sources.list.d/${Paquet}.list"								> '/dev/null'
+#			local CodeRetour=${?}
+#			TestSiErreur ${CodeRetour} "${Depot}" "ajout_dépôt"
+#			if [[ ${CodeRetour} -eq 0 ]]; then
+#				sudo apt-get install -qq -y ${Paquet}																> '/dev/null'
+#				local CodeRetour=${?}
+#				TestSiErreur ${CodeRetour} "${Paquet}"
+#			fi
+#			if [[ -e "multisystem.asc" ]]; then
+#				sudo rm "multisystem.asc"																	> '/dev/null'
+#			fi
+#		else
+#			local CodeRetour=0
+#			TestSiErreur ${CodeRetour} "${Paquet}" "ok"
+#		fi
 		local Paquet="nextcloud-client"				# Client Nexcloud pour Linux
 		local Depot="ppa:nextcloud-devs/client"			# Dépôt
 		if [[ $(dpkg -s ${Paquet} 2> '/dev/null' | grep Status | awk '{print $3}' | tr '[:upper:]' '[:lower:]') != "ok" ]]; then
