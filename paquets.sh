@@ -3,7 +3,7 @@
 ## Par Judibet (personnalisé)  ##
 
 ## VARIABLES ##
-VERSION="3.2"															# Version du script
+VERSION="3.3"															# Version du script
 UTILISATEUR="${USER}"														# Utilisateur courant
 LISTE_UTILISATEURS="$(echo $(getent passwd | awk -F: '999<$3 && $3<30000 && $1 != "nobody" {print $1}' | tr '\n' ','))"		# Liste des comptes utilisateurs
 TEMPORAIRE="$(mktemp --tmpdir=/var/tmp)"											# Fichier temporaire
@@ -4231,7 +4231,7 @@ function AfficherFin(){
 		echo "${FVERT} ${BLEU}RÉINSTALLATION DES PAQUETS DU SYSTÈME TERMINÉE${DEFAUT}"
 		echo
 		if [[ -e "${TEMPORAIRE}" ]]; then
-			sudo rm "${TEMPORAIRE}"																								2>&0
+			rm "${TEMPORAIRE}"																								2>&0
 		fi
 		exit ${CodeRetour}
 	else
@@ -4247,11 +4247,11 @@ function AfficherFin(){
 		if [[ -e "${JOURNALISATION}" ]] && [[ $(cat ${JOURNALISATION} 2> '/dev/null' | wc -l) -gt 0 ]]; then
 			echo "${MAGENTA} Voir journal dans ${JOURNALISATION}${DEFAUT}"
 		fi
-		sudo rm "${TEMPORAIRE}"																									2>&0
+		rm "${TEMPORAIRE}"																									2>&0
 		exit ${CodeRetour}
 	fi
 	if [[ -e "${TEMPORAIRE}" ]]; then
-		sudo rm "${TEMPORAIRE}"																									2>&0
+		rm "${TEMPORAIRE}"																									2>&0
 	fi
 	:
 }
