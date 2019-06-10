@@ -3,7 +3,7 @@
 ## Par Judibet (personnalisé)  ##
 
 ## VARIABLES ##
-VERSION="3.4"															# Version du script
+VERSION="3.5"															# Version du script
 UTILISATEUR="${USER}"														# Utilisateur courant
 LISTE_UTILISATEURS="$(echo $(getent passwd | awk -F: '999<$3 && $3<30000 && $1 != "nobody" {print $1}' | tr '\n' ','))"		# Liste des comptes utilisateurs
 TEMPORAIRE="$(mktemp --tmpdir=/var/tmp)"											# Fichier temporaire
@@ -1779,6 +1779,8 @@ function PaquetsCompilation(){
 function PaquetsInternet(){
 # Variables locales
 	local Type="$(echo ${1} | tr '[:upper:]' '[:lower:]')"									# Type d'installation
+	local FicTmp=""														# Nom du fichier temporaire
+	local DestTmp="${DosTmp}/${FicTmp}"											# Fichier temporaire de destination
 	local Paquet=""														# Paquet à installer
 	local CodeRetour=0													# Code retour
 	#
@@ -1844,16 +1846,42 @@ function PaquetsInternet(){
 			local CodeRetour=0
 			TestSiErreur ${CodeRetour} "${Paquet}" "ok"
 		fi
-		local Paquet="skype"					# Visioconférences et messagerie instantannée
-		if [[ $(snap list | grep ${Paquet} | awk '{print $1}' 2>&0 | tr '[:upper:]' '[:lower:]') != "${Paquet}" ]]; then
-			echo " ${CYAN}Installation du paquet ${BLANC}${Paquet}${CYAN} en cours...${DEFAUT}"
-			snap install ${Paquet} --classic																	> '/dev/null'
+		# Skype
+		local Paquet="https://repo.skype.com/latest/skypeforlinux-64.deb"
+		local FicTmp="$(echo $(basename ${Paquet}))"		# Nom du fichier temporaire
+		local DestTmp="${DosTmp}/${FicTmp}"			# Fichier temporaire de destination
+		echo " ${JAUNE}Téléchargement du paquet ${CYAN}${FicTmp}${JAUNE} en cours...${DEFAUT}"
+		wget -q "${Paquet}" --show-progress --progress=bar:force -O "${DestTmp}"																2>&0
+		local CodeRetour=${?}
+		TestSiErreur ${CodeRetour} "${Paquet}" "wget"
+		if [[ -e "${DestTmp}" ]]; then
+			echo " ${CYAN}Installation du paquet ${BLANC}${FicTmp}${CYAN} en cours...${DEFAUT}"
+			sudo dpkg -i "${DestTmp}"																		&> '/dev/null'
 			local CodeRetour=${?}
-			TestSiErreur ${CodeRetour} "${Paquet}"
+			TestSiErreur ${CodeRetour} "${FicTmp}" "dpkg"
+			if [[ ${CodeRetour} -ne 0 ]]; then
+				echo " ${JAUNE}Correction des dépendances en cours${DEFAUT}"
+				sudo apt --fix-broken install -y																&> '/dev/null'
+				local CodeRetour=${?}
+				TestSiErreur ${CodeRetour} "${FicTmp}" "fix"
+			fi
 		else
-			local CodeRetour=0
-			TestSiErreur ${CodeRetour} "${Paquet}" "ok"
+			local CodeRetour=127
+			TestSiErreur ${CodeRetour} "${FicTmp}" "dpkg_absent"
 		fi
+		if [[ -e "${DestTmp}" ]]; then
+			rm "${DestTmp}"																							2>&0
+		fi
+#		local Paquet="skype"					# Visioconférences et messagerie instantannée
+#		if [[ $(snap list | grep ${Paquet} | awk '{print $1}' 2>&0 | tr '[:upper:]' '[:lower:]') != "${Paquet}" ]]; then
+#			echo " ${CYAN}Installation du paquet ${BLANC}${Paquet}${CYAN} en cours...${DEFAUT}"
+#			snap install ${Paquet} --classic																	> '/dev/null'
+#			local CodeRetour=${?}
+#			TestSiErreur ${CodeRetour} "${Paquet}"
+#		else
+#			local CodeRetour=0
+#			TestSiErreur ${CodeRetour} "${Paquet}" "ok"
+#		fi
 		local Paquet="wakeonlan"				# Wake On Lan
 		if [[ $(dpkg -s ${Paquet} 2> '/dev/null' | grep Status | awk '{print $3}' | tr '[:upper:]' '[:lower:]') != "ok" ]]; then
 			echo " ${CYAN}Installation du paquet ${BLANC}${Paquet}${CYAN} en cours...${DEFAUT}"
@@ -2497,6 +2525,31 @@ function PaquetsMultimedia(){
 			local CodeRetour=0
 			TestSiErreur ${CodeRetour} "${Paquet}" "ok"
 		fi
+		if [[ ${DESKTOP_SESSION} =~ plasma|kde|kde-plasma ]]; then
+			local Paquet="kdenlive"				# Éditeur vidéo
+			if [[ $(dpkg -s ${Paquet} 2> '/dev/null' | grep Status | awk '{print $3}' | tr '[:upper:]' '[:lower:]') != "ok" ]]; then
+				echo " ${CYAN}Installation du paquet ${BLANC}${Paquet}${CYAN} en cours...${DEFAUT}"
+				sudo apt-get install -qq -y ${Paquet}																> '/dev/null'
+				local CodeRetour=${?}
+				TestSiErreur ${CodeRetour} "${Paquet}"
+			else
+				local CodeRetour=0
+				TestSiErreur ${CodeRetour} "${Paquet}" "ok"
+			fi
+			:
+		else
+			local Paquet="pitivi"				# Éditeur vidéo
+			if [[ $(dpkg -s ${Paquet} 2> '/dev/null' | grep Status | awk '{print $3}' | tr '[:upper:]' '[:lower:]') != "ok" ]]; then
+				echo " ${CYAN}Installation du paquet ${BLANC}${Paquet}${CYAN} en cours...${DEFAUT}"
+				sudo apt-get install -qq -y ${Paquet}																> '/dev/null'
+				local CodeRetour=${?}
+				TestSiErreur ${CodeRetour} "${Paquet}"
+			else
+				local CodeRetour=0
+				TestSiErreur ${CodeRetour} "${Paquet}" "ok"
+			fi
+			:
+		fi
 		local Paquet="kid3-cli"					# Un taggueur pour fichiers audio (en lignes de commandes)
 		if [[ $(dpkg -s ${Paquet} 2> '/dev/null' | grep Status | awk '{print $3}' | tr '[:upper:]' '[:lower:]') != "ok" ]]; then
 			echo " ${CYAN}Installation du paquet ${BLANC}${Paquet}${CYAN} en cours...${DEFAUT}"
@@ -2530,6 +2583,9 @@ function PaquetsMultimedia(){
 				sudo chmod +x "${Dest}"																						2>&0
 				local CodeRetour=${?}
 				TestSiErreur ${CodeRetour} "${Fic}" "chmod"
+				if [[ ${CodeRetour} -eq 0 ]]; then
+					echo " ${JAUNE}Pensez à faire un ${CYAN}./${Dest}${JAUNE} pour effectuer le premier lancement et l'intégration du logiciel ${CYAN}${Fic}${DEFAUT}"
+				fi
 			else
 				local CodeRetour=127
 				TestSiErreur ${CodeRetour} "${Fic}" "absent"
@@ -2565,41 +2621,41 @@ function PaquetsMultimedia(){
 			local CodeRetour=0
 			TestSiErreur ${CodeRetour} "${Paquet}" "ok"
 		fi
-#		local Paquet="spotify"					# Lecteur multimédia en ligne
-#		local Cle="931FF8E79F0876134EDDBDCCA87FF9DF48BF1C90"	# Clé publique du dépôt
-#		local Depot="http://repository.spotify.com"		# Dépôt
-#		if [[ $(dpkg -s ${Paquet} 2> '/dev/null' | grep Status | awk '{print $3}' | tr '[:upper:]' '[:lower:]') != "ok" ]]; then
-#			echo " ${CYAN}Installation du paquet ${BLANC}${Paquet}${CYAN} en cours...${DEFAUT}"
-#			echo " ${JAUNE}Ajout de la clé publique ${CYAN}${Cle}${JAUNE} pour le dépôt ${CYAN}${Depot}${JAUNE} en cours...${DEFAUT}"
-#			sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys ${Cle}															2>&0
-#			local CodeRetour=${?}
-#			TestSiErreur ${CodeRetour} "${Cle}" "clé"
-#			if [[ ! -e "/etc/apt/sources.list.d/${Paquet}.list" ]] || [[ $(cat "/etc/apt/sources.list.d/${Paquet}.list" 2>'/dev/null') != "deb ${Depot} stable non-free" ]]; then
-#				echo "deb ${Depot} stable non-free" | sudo tee "/etc/apt/sources.list.d/${Paquet}.list"										> '/dev/null'
-#				local CodeRetour=${?}
-#				TestSiErreur ${CodeRetour} "${Depot}" "ajout_dépôt"
-#			fi
-#			echo " ${JAUNE}Mise à jour en cours...${DEFAUT}"
-#			sudo apt-get update -qq -y																		> '/dev/null'
-#			local CodeRetour=${?}
-#			TestSiErreur ${CodeRetour} "" "maj"
-#			sudo apt-get install -qq -y ${Paquet}																	> '/dev/null'
-#			local CodeRetour=${?}
-#			TestSiErreur ${CodeRetour} "${Paquet}"
-#		else
-#			local CodeRetour=0
-#			TestSiErreur ${CodeRetour} "${Paquet}" "ok"
-#		fi
 		local Paquet="spotify"					# Lecteur multimédia en ligne
-		if [[ $(snap list | grep ${Paquet} | awk '{print $1}' 2>&0 | tr '[:upper:]' '[:lower:]') != "${Paquet}" ]]; then
+		local Cle="931FF8E79F0876134EDDBDCCA87FF9DF48BF1C90"	# Clé publique du dépôt
+		local Depot="http://repository.spotify.com"		# Dépôt
+		if [[ $(dpkg -s ${Paquet} 2> '/dev/null' | grep Status | awk '{print $3}' | tr '[:upper:]' '[:lower:]') != "ok" ]]; then
 			echo " ${CYAN}Installation du paquet ${BLANC}${Paquet}${CYAN} en cours...${DEFAUT}"
-			snap install ${Paquet}																			> '/dev/null'
+			echo " ${JAUNE}Ajout de la clé publique ${CYAN}${Cle}${JAUNE} pour le dépôt ${CYAN}${Depot}${JAUNE} en cours...${DEFAUT}"
+			sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys ${Cle}															2>&0
+			local CodeRetour=${?}
+			TestSiErreur ${CodeRetour} "${Cle}" "clé"
+			if [[ ! -e "/etc/apt/sources.list.d/${Paquet}.list" ]] || [[ ! $(cat "/etc/apt/sources.list.d/${Paquet}.list" 2>'/dev/null') =~ deb\ ${Depot}\ stable\ non-free ]]; then
+				echo "deb ${Depot} stable non-free" | sudo tee "/etc/apt/sources.list.d/${Paquet}.list"										> '/dev/null'
+				local CodeRetour=${?}
+				TestSiErreur ${CodeRetour} "${Depot}" "ajout_dépôt"
+			fi
+			echo " ${JAUNE}Mise à jour en cours...${DEFAUT}"
+			sudo apt-get update -qq -y																		> '/dev/null'
+			local CodeRetour=${?}
+			TestSiErreur ${CodeRetour} "" "maj"
+			sudo apt-get install -qq -y ${Paquet}																	> '/dev/null'
 			local CodeRetour=${?}
 			TestSiErreur ${CodeRetour} "${Paquet}"
 		else
 			local CodeRetour=0
 			TestSiErreur ${CodeRetour} "${Paquet}" "ok"
 		fi
+#		local Paquet="spotify"					# Lecteur multimédia en ligne
+#		if [[ $(snap list | grep ${Paquet} | awk '{print $1}' 2>&0 | tr '[:upper:]' '[:lower:]') != "${Paquet}" ]]; then
+#			echo " ${CYAN}Installation du paquet ${BLANC}${Paquet}${CYAN} en cours...${DEFAUT}"
+#			snap install ${Paquet}																			> '/dev/null'
+#			local CodeRetour=${?}
+#			TestSiErreur ${CodeRetour} "${Paquet}"
+#		else
+#			local CodeRetour=0
+#			TestSiErreur ${CodeRetour} "${Paquet}" "ok"
+#		fi
 		local Paquet="streamripper"				# Enregistrement de flux audio (kstreamripper non disponible)
 		if [[ $(dpkg -s ${Paquet} 2> '/dev/null' | grep Status | awk '{print $3}' | tr '[:upper:]' '[:lower:]') != "ok" ]]; then
 			echo " ${CYAN}Installation du paquet ${BLANC}${Paquet}${CYAN} en cours...${DEFAUT}"
@@ -2614,6 +2670,16 @@ function PaquetsMultimedia(){
 	fi
 	if [[ "${Type}" == "tout" ]]; then
 		local Paquet="abcde"					# Encodeur CD sous terminal
+		if [[ $(dpkg -s ${Paquet} 2> '/dev/null' | grep Status | awk '{print $3}' | tr '[:upper:]' '[:lower:]') != "ok" ]]; then
+			echo " ${CYAN}Installation du paquet ${BLANC}${Paquet}${CYAN} en cours...${DEFAUT}"
+			sudo apt-get install -qq -y ${Paquet}																	> '/dev/null'
+			local CodeRetour=${?}
+			TestSiErreur ${CodeRetour} "${Paquet}"
+		else
+			local CodeRetour=0
+			TestSiErreur ${CodeRetour} "${Paquet}" "ok"
+		fi
+		local Paquet="blender"					# Suite logicielle pour création 3D, la référence !
 		if [[ $(dpkg -s ${Paquet} 2> '/dev/null' | grep Status | awk '{print $3}' | tr '[:upper:]' '[:lower:]') != "ok" ]]; then
 			echo " ${CYAN}Installation du paquet ${BLANC}${Paquet}${CYAN} en cours...${DEFAUT}"
 			sudo apt-get install -qq -y ${Paquet}																	> '/dev/null'
