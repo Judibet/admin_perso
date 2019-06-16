@@ -3,7 +3,7 @@
 ## Par Judibet (personnalisé)  ##
 
 ## VARIABLES ##
-VERSION="3.5"															# Version du script
+VERSION="3.6"															# Version du script
 UTILISATEUR="${USER}"														# Utilisateur courant
 LISTE_UTILISATEURS="$(echo $(getent passwd | awk -F: '999<$3 && $3<30000 && $1 != "nobody" {print $1}' | tr '\n' ','))"		# Liste des comptes utilisateurs
 TEMPORAIRE="$(mktemp --tmpdir=/var/tmp)"											# Fichier temporaire
@@ -1539,6 +1539,16 @@ function PaquetsBureautique(){
 		TestSiErreur ${CodeRetour} "${Paquet}" "ok"
 	fi
 	local Paquet="libreoffice-pdfimport"				# Permet d'éditer les fichiers PDF
+	if [[ $(dpkg -s ${Paquet} 2> '/dev/null' | grep Status | awk '{print $3}' | tr '[:upper:]' '[:lower:]') != "ok" ]]; then
+		echo " ${CYAN}Installation du paquet ${BLANC}${Paquet}${CYAN} en cours...${DEFAUT}"
+		sudo apt-get install -qq -y ${Paquet}																		> '/dev/null'
+		local CodeRetour=${?}
+		TestSiErreur ${CodeRetour} "${Paquet}"
+	else
+		local CodeRetour=0
+		TestSiErreur ${CodeRetour} "${Paquet}" "ok"
+	fi
+	local Paquet="ttf-mscorefonts-installer"			# Polices Microsoft (utile pour ne pas avoir des documents différents)
 	if [[ $(dpkg -s ${Paquet} 2> '/dev/null' | grep Status | awk '{print $3}' | tr '[:upper:]' '[:lower:]') != "ok" ]]; then
 		echo " ${CYAN}Installation du paquet ${BLANC}${Paquet}${CYAN} en cours...${DEFAUT}"
 		sudo apt-get install -qq -y ${Paquet}																		> '/dev/null'
