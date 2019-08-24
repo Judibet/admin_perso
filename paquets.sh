@@ -3,7 +3,7 @@
 ## Par Judibet (personnalisé)  ##
 
 ## VARIABLES ##
-VERSION="3.6"															# Version du script
+VERSION="3.7"															# Version du script
 UTILISATEUR="${USER}"														# Utilisateur courant
 LISTE_UTILISATEURS="$(echo $(getent passwd | awk -F: '999<$3 && $3<30000 && $1 != "nobody" {print $1}' | tr '\n' ','))"		# Liste des comptes utilisateurs
 TEMPORAIRE="$(mktemp --tmpdir=/var/tmp)"											# Fichier temporaire
@@ -1310,13 +1310,25 @@ function TestSiErreur(){
 function PilotesGraphiques(){
 	# Variables locales
 	local Paquet=""														# Paquet à installer
+	local Depot=""														# Dépôt à rajouter
 	local CodeRetour=0													# Code retour
 	#
 	# Installation des pilotes NVidia
 	local Paquet="nvidia-driver"					# Installation du pilote recommandé
+	local Depot="ppa:graphics-drivers/ppa"				# Dépôt
 	if [[ $(ubuntu-drivers devices | grep NVIDIA | awk '{print $3}' | tr '[:lower:]' '[:upper:]') == "NVIDIA" ]]; then
 		if [[ $(dpkg -l | grep ${Paquet} | awk '{print $1}') != "ii" ]]; then
 			echo " ${CYAN}Installation du pilote graphique NVidia [${VERT}${Paquet}${CYAN}]${DEFAUT}"
+			yes | sudo add-apt-repository -y ${Depot}																		> '/dev/null'
+			local CodeRetour=${?}
+			TestSiErreur ${CodeRetour} "${Depot}" "ajout_dépôt"
+			echo " ${JAUNE}Mise à jour en cours...${DEFAUT}"
+			sudo apt-get update -qq -y																			> '/dev/null'
+			local CodeRetour=${?}
+			TestSiErreur ${CodeRetour} "" "maj"
+			sudo apt-get install -qq -y ${Paquet}																		> '/dev/null'
+			local CodeRetour=${?}
+			TestSiErreur ${CodeRetour} "${Paquet}"
 			sudo ubuntu-drivers autoinstall																		> '/dev/null'
 			local CodeRetour=${?}
 			TestSiErreur ${CodeRetour} "${Paquet}"
@@ -2365,6 +2377,16 @@ function PaquetsJeux(){
 			fi
 			echo " ${JAUNE}Fin d'installation des dépendances de Steam${DEFAUT}"
 		fi
+	else
+		local CodeRetour=0
+		TestSiErreur ${CodeRetour} "${Paquet}" "ok"
+	fi
+	local Paquet="tmnationsforever"					# Jeux de course fun avec des F1 aux couleurs de son pays !
+	if [[ $(snap list | grep ${Paquet} | awk '{print $1}' 2>&0 | tr '[:upper:]' '[:lower:]') != "${Paquet}" ]]; then
+		echo " ${CYAN}Installation du paquet ${BLANC}${Paquet}${CYAN} en cours...${DEFAUT}"
+		snap install ${Paquet}																			> '/dev/null'
+		local CodeRetour=${?}
+		TestSiErreur ${CodeRetour} "${Paquet}"
 	else
 		local CodeRetour=0
 		TestSiErreur ${CodeRetour} "${Paquet}" "ok"
