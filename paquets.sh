@@ -2604,7 +2604,7 @@ function PaquetsMultimedia(){
 		fi
 		# Molotov.tv
 		if [[ ! -d "/opt/molotov.AppImage" ]]; then
-			local Paquet="http://desktop-auto-upgrade.molotov.tv/linux/4.0.0/molotov.AppImage"
+			local Paquet="http://desktop-auto-upgrade.molotov.tv/linux/4.1.0/molotov.AppImage"
 			local Fic="$(echo $(basename ${Paquet}))"								# Fichier de destination
 			local Dest="/opt/${Fic}"										# Destination
 			echo " ${JAUNE}Téléchargement du paquet ${CYAN}${FicTmp}${JAUNE} en cours...${DEFAUT}"
