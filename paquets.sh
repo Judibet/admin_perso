@@ -3,7 +3,7 @@
 ## Par Judibet (personnalisé)  ##
 
 ## VARIABLES ##
-VERSION="3.7"															# Version du script
+VERSION="3.8"															# Version du script
 UTILISATEUR="${USER}"														# Utilisateur courant
 LISTE_UTILISATEURS="$(echo $(getent passwd | awk -F: '999<$3 && $3<30000 && $1 != "nobody" {print $1}' | tr '\n' ','))"		# Liste des comptes utilisateurs
 TEMPORAIRE="$(mktemp --tmpdir=/var/tmp)"											# Fichier temporaire
@@ -1868,6 +1868,31 @@ function PaquetsInternet(){
 			local CodeRetour=0
 			TestSiErreur ${CodeRetour} "${Paquet}" "ok"
 		fi
+		local Paquet="signal-desktop"				# Signal, messagerie instantanée sécurisée
+		local Cle="https://updates.signal.org/desktop/apt/keys.asc"	# Clé publique du dépôt
+		local Depot="https://updates.signal.org/desktop/apt"	# Dépôt
+		if [[ $(dpkg -s ${Paquet} 2> '/dev/null' | grep Status | awk '{print $3}' | tr '[:upper:]' '[:lower:]') != "ok" ]]; then
+			echo " ${CYAN}Installation du paquet ${BLANC}${Paquet}${CYAN} en cours...${DEFAUT}"
+			echo " ${JAUNE}Ajout de la clé publique ${CYAN}${Cle}${JAUNE} pour le dépôt ${CYAN}${Depot}${JAUNE} en cours...${DEFAUT}"
+			sudo wget -q -O- ${Cle} | sudo apt-key add -																			2>&0
+			local CodeRetour=${?}
+			TestSiErreur ${CodeRetour} "${Cle}" "clé"
+			if [[ ! -e "/etc/apt/sources.list.d/$(echo ${Paquet} | sed 's/-desktop/-xenial/g').list" ]] ||\
+				[[ ! $(cat "/etc/apt/sources.list.d/$(echo ${Paquet} | sed 's/-desktop/-xenial/g').list" &> '/dev/null') =~ deb\ \[arch=amd64\]\ ${Depot}\ xenial\ main ]]; then
+				echo "deb [arch=amd64] ${Depot} xenial main" |  sudo tee "/etc/apt/sources.list.d/$(echo ${Paquet} | sed 's/-desktop/-xenial/g').list"				> '/dev/null'
+				local CodeRetour=${?}
+				TestSiErreur ${CodeRetour} "${Depot}" "ajout_dépôt"
+#				if [[ ${CodeRetour} -eq 0 ]] &&\
+#					[[ ! $(cat "/etc/apt/sources.list.d/$(echo ${Paquet} | sed 's/-desktop/-xenial/g').list" &> '/dev/null') =~ deb-src\ \[arch=amd64\]\ ${Depot}\ xenial\ main ]]; then
+#					echo "deb-src [arch=amd64] ${Depot} xenial main" | sudo tee -a "/etc/apt/sources.list.d/$(echo ${Paquet} | sed 's/-desktop/-xenial/g').list"		> '/dev/null'
+#					local CodeRetour=${?}
+#					TestSiErreur ${CodeRetour} "${Depot}" "ajout_source"
+#				fi
+				:
+			fi
+		fi
+		local Paquet="nextcloud-client"				# Client Nexcloud pour Linux
+		local Depot="ppa:nextcloud-devs/client"			# Dépôt
 		# Skype
 		local Paquet="https://repo.skype.com/latest/skypeforlinux-64.deb"
 		local FicTmp="$(echo $(basename ${Paquet}))"		# Nom du fichier temporaire
@@ -3582,7 +3607,7 @@ function PaquetsUtilitaires(){
 #			sudo wget -q -O- ${Cle} | sudo apt-key add -																			2>&0
 #			local CodeRetour=${?}
 #			TestSiErreur ${CodeRetour} "${Cle}" "clé"
-#			echo "deb http://liveusb.info/multisystem/depot all main" |  sudo tee "/etc/apt/sources.list.d/${Paquet}.list"								> '/dev/null'
+#			echo "deb ${Depot} all main" |  sudo tee "/etc/apt/sources.list.d/${Paquet}.list"											> '/dev/null'
 #			local CodeRetour=${?}
 #			TestSiErreur ${CodeRetour} "${Depot}" "ajout_dépôt"
 #			if [[ ${CodeRetour} -eq 0 ]]; then
@@ -3590,8 +3615,8 @@ function PaquetsUtilitaires(){
 #				local CodeRetour=${?}
 #				TestSiErreur ${CodeRetour} "${Paquet}"
 #			fi
-#			if [[ -e "multisystem.asc" ]]; then
-#				sudo rm "multisystem.asc"																	> '/dev/null'
+#			if [[ -e "${Paquet}.asc" ]]; then
+#				sudo rm "${Paquet}.asc"																		> '/dev/null'
 #			fi
 #		else
 #			local CodeRetour=0
