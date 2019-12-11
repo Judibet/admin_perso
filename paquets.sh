@@ -3,7 +3,7 @@
 ## Par Judibet (personnalisé)  ##
 
 ## VARIABLES ##
-VERSION="3.8"															# Version du script
+VERSION="3.9"															# Version du script
 UTILISATEUR="${USER}"														# Utilisateur courant
 LISTE_UTILISATEURS="$(echo $(getent passwd | awk -F: '999<$3 && $3<30000 && $1 != "nobody" {print $1}' | tr '\n' ','))"		# Liste des comptes utilisateurs
 TEMPORAIRE="$(mktemp --tmpdir=/var/tmp)"											# Fichier temporaire
@@ -2254,6 +2254,30 @@ function PaquetsJeux(){
 		else
 			local CodeRetour=0
 			TestSiErreur ${CodeRetour} "${Paquet}" "ok"
+		fi
+		local Paquet="lutris"					# Un gestionnaire de jeux libre, comme Steam mais libre !
+		local Depot="ppa:lutris-team/lutris"
+		sudo add-apt-repository -y ${Depot}																		> '/dev/null'
+		local CodeRetour=${?}
+		TestSiErreur ${CodeRetour} "${Depot}" "ajout_dépôt"
+		echo " ${JAUNE}Mise à jour en cours...${DEFAUT}"
+		sudo apt-get update -qq -y																			> '/dev/null'
+		local CodeRetour=${?}
+		TestSiErreur ${CodeRetour} "" "maj"
+		sudo apt-get install -qq -y ${Paquet}																		> '/dev/null'
+		local CodeRetour=${?}
+		TestSiErreur ${CodeRetour} "${Paquet}"
+		if [[ ${CodeRetour} -eq 0 ]]; then
+			if [[ $(dpkg -s ${Paquet} 2> '/dev/null' | grep Status | awk '{print $3}' | tr '[:upper:]' '[:lower:]') != "ok" ]]; then
+				echo " ${CYAN}Installation du paquet ${BLANC}${Paquet}${CYAN} en cours...${DEFAUT}"
+				sudo apt-get install -qq -y ${Paquet}																> '/dev/null'
+				local CodeRetour=${?}
+				TestSiErreur ${CodeRetour} "${Paquet}"
+			else
+				local CodeRetour=0
+				TestSiErreur ${CodeRetour} "${Paquet}" "ok"
+			fi
+			:
 		fi
 		local Paquet="openarena-server"				# Possibilité de créer des serveurs Open Arena
 		if [[ $(dpkg -s ${Paquet} 2> '/dev/null' | grep Status | awk '{print $3}' | tr '[:upper:]' '[:lower:]') != "ok" ]]; then
