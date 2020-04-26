@@ -3,7 +3,7 @@
 ## Par Judibet (personnalisé)  ##
 
 ## VARIABLES ##
-VERSION="4.0"															# Version du script
+VERSION="4.1"															# Version du script
 UTILISATEUR="${USER}"														# Utilisateur courant
 LISTE_UTILISATEURS="$(echo $(getent passwd | awk -F: '999<$3 && $3<30000 && $1 != "nobody" {print $1}' | tr '\n' ','))"		# Liste des comptes utilisateurs
 TEMPORAIRE="$(mktemp --tmpdir=/var/tmp)"											# Fichier temporaire
@@ -1686,6 +1686,16 @@ function PaquetsDeveloppement(){
 		:
 	fi
 	if [[ ${Type} == "tout" ]] ;then
+	local Paquet="android-sdk"					# Ressources de développement pour Android
+	if [[ $(dpkg -s ${Paquet} 2> '/dev/null' | grep Status | awk '{print $3}' | tr '[:upper:]' '[:lower:]') != "ok" ]]; then
+		echo " ${CYAN}Installation du paquet ${BLANC}${Paquet}${CYAN} en cours...${DEFAUT}"
+		sudo apt-get install -qq -y ${Paquet}																		> '/dev/null'
+		local CodeRetour=${?}
+		TestSiErreur ${CodeRetour} "${Paquet}"
+	else
+		local CodeRetour=0
+		TestSiErreur ${CodeRetour} "${Paquet}" "ok"
+	fi
 	local Paquet="mono-devel"					# Plateforme d'exécution .NET
 		if [[ $(dpkg -s ${Paquet} 2> '/dev/null' | grep Status | awk '{print $3}' | tr '[:upper:]' '[:lower:]') != "ok" ]]; then
 			echo " ${CYAN}Installation du paquet ${BLANC}${Paquet}${CYAN} en cours...${DEFAUT}"
@@ -3602,20 +3612,6 @@ function PaquetsUtilitaires(){
 			fi
 			:
 		fi
-		local Paquet="anbox"					# Emulateur Android sous Linux
-		if [[ $(snap list | grep ${Paquet} | awk '{print $1}' 2>&0 | tr '[:upper:]' '[:lower:]') != "${Paquet}" ]]; then
-			echo " ${CYAN}Installation du paquet ${BLANC}${Paquet}${CYAN} en cours...${DEFAUT}"
-			snap install --edge --devmode ${Paquet}																		> '/dev/null'
-			local CodeRetour=${?}
-			TestSiErreur ${CodeRetour} "${Paquet}"
-		else
-			local CodeRetour=0
-			TestSiErreur ${CodeRetour} "${Paquet}" "ok"
-		fi
-		local Paquet="keepassxc"				# Gestionnaire de mots de passe
-		local Cle="D89C66D0E31FEA2874EBD20561922AB60068FCD6"	# Clé publique du dépôt
-		local Depot="ppa:phoerious/keepassxc"			# Dépôt
-		if [[ $(dpkg -s ${Paquet} 2> '/dev/null' | grep Status | awk '{print $3}' | tr '[:upper:]' '[:lower:]') != "ok" ]]; then
 			echo " ${CYAN}Installation du paquet ${BLANC}${Paquet}${CYAN} en cours...${DEFAUT}"
 			echo " ${JAUNE}Ajout de la clé publique ${CYAN}${Cle}${JAUNE} pour le dépôt ${CYAN}${Depot}${JAUNE} en cours...${DEFAUT}"
 			sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys ${Cle}															2>&0
@@ -3840,7 +3836,21 @@ function PaquetsUtilitaires(){
 			fi
 			:
 		fi
-		local Paquet="alien"					# Installation des parquets RPM
+		local Paquet="anbox"					# Emulateur Android sous Linux
+		if [[ $(snap list | grep ${Paquet} | awk '{print $1}' 2>&0 | tr '[:upper:]' '[:lower:]') != "${Paquet}" ]]; then
+			echo " ${CYAN}Installation du paquet ${BLANC}${Paquet}${CYAN} en cours...${DEFAUT}"
+			snap install --edge --devmode ${Paquet}																		> '/dev/null'
+			local CodeRetour=${?}
+			TestSiErreur ${CodeRetour} "${Paquet}"
+		else
+			local CodeRetour=0
+			TestSiErreur ${CodeRetour} "${Paquet}" "ok"
+		fi
+		local Paquet="keepassxc"				# Gestionnaire de mots de passe
+		local Cle="D89C66D0E31FEA2874EBD20561922AB60068FCD6"	# Clé publique du dépôt
+		local Depot="ppa:phoerious/keepassxc"			# Dépôt
+		if [[ $(dpkg -s ${Paquet} 2> '/dev/null' | grep Status | awk '{print $3}' | tr '[:upper:]' '[:lower:]') != "ok" ]]; then
+		local Paquet="android-tools-adb"			# Outils pour Android
 		if [[ $(dpkg -s ${Paquet} 2> '/dev/null' | grep Status | awk '{print $3}' | tr '[:upper:]' '[:lower:]') != "ok" ]]; then
 			echo " ${CYAN}Installation du paquet ${BLANC}${Paquet}${CYAN} en cours...${DEFAUT}"
 			sudo apt-get install -qq -y ${Paquet}																	> '/dev/null'
@@ -3850,7 +3860,7 @@ function PaquetsUtilitaires(){
 			local CodeRetour=0
 			TestSiErreur ${CodeRetour} "${Paquet}" "ok"
 		fi
-		local Paquet="android-tools-adb"			# Outils pour Android
+		local Paquet="alien"					# Installation des parquets RPM
 		if [[ $(dpkg -s ${Paquet} 2> '/dev/null' | grep Status | awk '{print $3}' | tr '[:upper:]' '[:lower:]') != "ok" ]]; then
 			echo " ${CYAN}Installation du paquet ${BLANC}${Paquet}${CYAN} en cours...${DEFAUT}"
 			sudo apt-get install -qq -y ${Paquet}																	> '/dev/null'
