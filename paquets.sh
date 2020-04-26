@@ -3,7 +3,7 @@
 ## Par Judibet (personnalisé)  ##
 
 ## VARIABLES ##
-VERSION="4.1"															# Version du script
+VERSION="4.2"															# Version du script
 UTILISATEUR="${USER}"														# Utilisateur courant
 LISTE_UTILISATEURS="$(echo $(getent passwd | awk -F: '999<$3 && $3<30000 && $1 != "nobody" {print $1}' | tr '\n' ','))"		# Liste des comptes utilisateurs
 TEMPORAIRE="$(mktemp --tmpdir=/var/tmp)"											# Fichier temporaire
@@ -3839,7 +3839,8 @@ function PaquetsUtilitaires(){
 		local Paquet="anbox"					# Emulateur Android sous Linux
 		if [[ $(snap list | grep ${Paquet} | awk '{print $1}' 2>&0 | tr '[:upper:]' '[:lower:]') != "${Paquet}" ]]; then
 			echo " ${CYAN}Installation du paquet ${BLANC}${Paquet}${CYAN} en cours...${DEFAUT}"
-			snap install --edge --devmode ${Paquet}																		> '/dev/null'
+			#snap install --edge --devmode ${Paquet}																		> '/dev/null'
+			snap install --beta --devmode ${Paquet}																		> '/dev/null'
 			local CodeRetour=${?}
 			TestSiErreur ${CodeRetour} "${Paquet}"
 		else
