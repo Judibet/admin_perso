@@ -3,7 +3,7 @@
 ## Par Judibet (personnalisé)  ##
 
 ## VARIABLES ##
-VERSION="3.9"															# Version du script
+VERSION="4.0"															# Version du script
 UTILISATEUR="${USER}"														# Utilisateur courant
 LISTE_UTILISATEURS="$(echo $(getent passwd | awk -F: '999<$3 && $3<30000 && $1 != "nobody" {print $1}' | tr '\n' ','))"		# Liste des comptes utilisateurs
 TEMPORAIRE="$(mktemp --tmpdir=/var/tmp)"											# Fichier temporaire
@@ -3601,6 +3601,16 @@ function PaquetsUtilitaires(){
 				:
 			fi
 			:
+		fi
+		local Paquet="anbox"					# Emulateur Android sous Linux
+		if [[ $(snap list | grep ${Paquet} | awk '{print $1}' 2>&0 | tr '[:upper:]' '[:lower:]') != "${Paquet}" ]]; then
+			echo " ${CYAN}Installation du paquet ${BLANC}${Paquet}${CYAN} en cours...${DEFAUT}"
+			snap install --edge --devmode ${Paquet}																		> '/dev/null'
+			local CodeRetour=${?}
+			TestSiErreur ${CodeRetour} "${Paquet}"
+		else
+			local CodeRetour=0
+			TestSiErreur ${CodeRetour} "${Paquet}" "ok"
 		fi
 		local Paquet="keepassxc"				# Gestionnaire de mots de passe
 		local Cle="D89C66D0E31FEA2874EBD20561922AB60068FCD6"	# Clé publique du dépôt
