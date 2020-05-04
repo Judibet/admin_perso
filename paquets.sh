@@ -3836,7 +3836,7 @@ function PaquetsUtilitaires(){
 			local CodeRetour=0
 			TestSiErreur ${CodeRetour} "${Paquet}" "ok"
 		fi
-		local Paquet="virtualbox-6.0"				# Émulateur PC/Mac
+		local Paquet="virtualbox"				# Émulateur PC/Mac
 		if [[ $(lsb_release -r | awk '{print $2}' | awk '{print substr($0,1,2)}') -gt 16 ]]; then
 			local Cle="http://download.virtualbox.org/virtualbox/debian/oracle_vbox_2016.asc"			# Clé publique du dépôt (depuis version 16.04)
 		else
