@@ -1,9 +1,9 @@
 #!/bin/bash
-## LISTE DES PAQUETS INSTALLÉS ##
+# LISTE DES PAQUETS INSTALLÉS ##
 ## Par Judibet (personnalisé)  ##
 
 ## VARIABLES ##
-VERSION="4.2"															# Version du script
+VERSION="4.6"															# Version du script
 UTILISATEUR="${USER}"														# Utilisateur courant
 LISTE_UTILISATEURS="$(echo $(getent passwd | awk -F: '999<$3 && $3<30000 && $1 != "nobody" {print $1}' | tr '\n' ','))"		# Liste des comptes utilisateurs
 TEMPORAIRE="$(mktemp --tmpdir=/var/tmp)"											# Fichier temporaire
@@ -1100,7 +1100,7 @@ function TestSiErreur(){
 			fi
 			:
 			;;
-		"untar" )
+		"untar" | "unzip" )
 			if [[ ${CodeRetour} -ne 0 ]]; then
 				echo " ${ROUGE}Échec de décompression du fichier ${JAUNE}${Objet}${ROUGE} a échoué (${JAUNE}${MODEGRAS}${CodeRetour}${PASGRAS}${ROUGE})${DEFAUT}"
 				echo "[$(date +%d-%m-%Y\ %H:%M:%S)]						Échec de la décompression du fichier ${Objet} [${CodeRetour}]"			>> "${TEMPORAIRE}"	2>&0
@@ -2221,6 +2221,60 @@ function PaquetsJeux(){
 		else
 			local CodeRetour=0
 			TestSiErreur ${CodeRetour} "${Paquet}" "ok"
+		fi
+		# Xonotic
+		local Paquet="https://dl.xonotic.org/xonotic-0.8.2.zip"
+		local FicTmp="$(echo ${Paquet} | awk '{print substr($0,9,7)}')"	# Nom du fichier temporaire
+		local DestTmp="${DosTmp}/${FicTmp}.zip"				# Fichier temporaire de destination
+		echo " ${JAUNE}Téléchargement du paquet ${CYAN}${FicTmp}${JAUNE} en cours...${DEFAUT}"
+		wget -q "${Paquet}" --show-progress --progress=bar:force -O "${DestTmp}"																2>&0
+		local CodeRetour=${?}
+		TestSiErreur ${CodeRetour} "${Paquet}" "wget"
+		if [[ -e "${DestTmp}" ]]; then
+			echo " ${CYAN}Décompression et installation du paquet ${BLANC}${FicTmp}${CYAN} en cours...${DEFAUT}"
+			sudo unzip "${DestTmp}"																			&> '/dev/null'
+			local CodeRetour=${?}
+			TestSiErreur ${CodeRetour} "${FicTmp}" "unzip"
+			if [[ ${CodeRetour} -eq 0 ]]; then
+				# Pas besoin des fichiers exe et OSX sous Linux
+				sudo rm "${DestTmp}/Xonotic/*.exe" "${DestTmp}/Xonotic/*osx*"																2>&0
+				sudo mv "${DestTmp}/Xonotic/" "/usr/share/"																		2>&0
+				local CodeRetour=${?}
+				TestSiErreur ${CodeRetour} "${FicTmp}" "mv"
+				# Si tout est OK, on fait un lien symbolique du jeu pour qu'il puisse se lancer en ligne de commandes
+				if [[ ${CodeRetour} -eq 0 ]] && [[ -e "/usr/share/Xonotic/xonotic-linux-sdl.sh" ]]; then
+					if [[ ! -x "/usr/share/Xonotic/xonotic-linux-sdl.sh" ]]; then
+						sudo chmod +x "/usr/share/Xonotic/xonotic-linux-sdl.sh"
+						local CodeRetour=${?}
+						TestSiErreur ${CodeRetour} "${FicTmp}" "chmod"
+					fi
+					sudo ln -s "/usr/share/Xonotic/xonotic-linux-sdl.sh" "/usr/games/${FicTmp}"
+					local CodeRetour=${?}
+					TestSiErreur ${CodeRetour} "${FicTmp}" "lien"
+				else
+					if [[ -x "/usr/share/Xonotic/xonotic-linux-sdl.sh" ]]; then
+						echo " ${JAUNE}Prévoyez un raccourcis pour lancer le jeu${DEFAUT}"
+					elif [[ -e "/usr/share/Xonotic/xonotic-linux-sdl.sh" ]]; then
+						sudo chmod +x "/usr/share/Xonotic/xonotic-linux-sdl.sh"
+						local CodeRetour=${?}
+						TestSiErreur ${CodeRetour} "${FicTmp}" "chmod"
+						if [[ ${CodeRetour} -eq 0 ]]; then
+							echo " ${JAUNE}Prévoyez un raccourcis pour lancer le jeu${DEFAUT}"
+						fi
+					else
+						local CodeRetour=90
+						TestSiErreur ${CodeRetour} "${Paquet}" "ko"
+					fi
+				:
+				fi
+			:
+			fi
+		else
+			local CodeRetour=127
+			TestSiErreur ${CodeRetour} "${FicTmp}" "zip_absent"
+		fi
+		if [[ -e "${DestTmp}" ]]; then
+			rm "${DestTmp}"																							2>&0
 		fi
 #		local Paquet="zsnes"					# Émulateur Super Nintendo (remplacé par Snes9x ?)
 #		if [[ $(dpkg -s ${Paquet} 2> '/dev/null' | grep Status | awk '{print $3}' | tr '[:upper:]' '[:lower:]') != "ok" ]]; then
@@ -3699,6 +3753,27 @@ function PaquetsUtilitaires(){
 		else
 			local CodeRetour=0
 			TestSiErreur ${CodeRetour} "${Paquet}" "ok"
+		fi
+		# pCloud
+		if [[ ! -e "/usr/bin/pcloud" ]]; then
+			local Paquet="https://www.pcloud.com/fr/how-to-install-pcloud-drive-linux.html?download=electron-64"
+			local Fic="$(echo ${Paquet} | awk -F'.' '{print $2}')"							# Fichier de destination
+			local Dest="/usr/bin/"										# Destination
+			echo " ${JAUNE}Téléchargement du paquet ${CYAN}${FicTmp}${JAUNE} en cours...${DEFAUT}"
+			sudo wget -q "${Paquet}" --show-progress --progress=bar:force -O "${Dest}"																2>&0
+			local CodeRetour=${?}
+			TestSiErreur ${CodeRetour} "${Paquet}" "wget"
+			if [[ -e "${Dest}/${Fic}" ]]; then
+				sudo chmod +x "${Dest}/${Fic}"																					2>&0
+				local CodeRetour=${?}
+				TestSiErreur ${CodeRetour} "${Fic}" "chmod"
+				if [[ ${CodeRetour} -eq 0 ]]; then
+					echo " ${JAUNE}Pensez à faire un ${CYAN}./${Dest}/${Paquet}${JAUNE} pour effectuer le premier lancement et l'intégration du logiciel ${CYAN}${Fic}${DEFAUT}"
+				fi
+			else
+				local CodeRetour=127
+				TestSiErreur ${CodeRetour} "${Fic}" "absent"
+			fi
 		fi
 #		local Paquet="recordmydesktop				# Capture vidéo du bureau
 #		if [[ $(dpkg -s ${Paquet} 2> '/dev/null' | grep Status | awk '{print $3}' | tr '[:upper:]' '[:lower:]') != "ok" ]]; then
